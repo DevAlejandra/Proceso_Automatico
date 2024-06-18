@@ -7,6 +7,9 @@ package proceso_automatico;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
@@ -64,23 +67,22 @@ public class FRM_Descarga extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(131, 131, 131)
+                        .addGap(162, 162, 162)
+                        .addComponent(jButton2))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(136, 136, 136)
                         .addComponent(jLabel1))
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(151, 151, 151)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jButton1)
-                            .addGroup(layout.createSequentialGroup()
-                                .addGap(11, 11, 11)
-                                .addComponent(jButton2)))))
-                .addContainerGap(156, Short.MAX_VALUE))
+                        .addGap(147, 147, 147)
+                        .addComponent(jButton1)))
+                .addContainerGap(151, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(45, 45, 45)
+                .addGap(44, 44, 44)
                 .addComponent(jLabel1)
-                .addGap(58, 58, 58)
+                .addGap(59, 59, 59)
                 .addComponent(jButton1)
                 .addGap(18, 18, 18)
                 .addComponent(jButton2)
@@ -93,16 +95,20 @@ public class FRM_Descarga extends javax.swing.JFrame {
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         // TODO add your handling code here:
         Connection conn = ConexionDB.connect();
-        try {
+        try (FileWriter csvWriter = new FileWriter(Paths.get(System.getProperty("user.home"), "Downloads", "Proceso_Automatico.csv").toString())) {
             Statement stmt = conn.createStatement();
             String query = "SELECT PARTNUMBER, QTY FROM TABLE_050524";
             ResultSet rs = stmt.executeQuery(query);
-            
+
+            csvWriter.append("Part Number, Quantity\n");
+
             while (rs.next()) {
                 String partNumber = rs.getString("PARTNUMBER");
                 int quantity = rs.getInt("QTY");
-                System.out.println("Part Number: " + partNumber + ", Quantity: " + quantity);
+                csvWriter.append(partNumber).append(",").append(String.valueOf(quantity)).append("\n");
             }
+
+            csvWriter.flush();
         } catch (Exception ex) {
             ex.printStackTrace();
         } finally {
